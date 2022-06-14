@@ -1,12 +1,31 @@
+function makeGETRequest(url, callback) {
+  var xhr;
+  if (window.XMLHttpRequest) {
+    xhr = new XMLHttpRequest();
+  } else if (window.ActiveXObject) {
+    xhr = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      callback(xhr.responseText);
+    }
+  };
+  xhr.open("GET", url, true);
+  xhr.send();
+}
+
+const API_URL =
+  "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
+
 class GoodsItem {
-  constructor(title, price) {
-    this.title = title;
+  constructor(product_name, price) {
+    this.product_name = product_name;
     this.price = price;
   }
 
   render() {
     return `<div
-  class="goods-item"><h3>${this.title}</h3><p>${this.price}</p></div>`;
+  class="goods-item"><h3>${this.product_name}</h3><p>${this.price}</p></div>`;
   }
 }
 
@@ -15,13 +34,11 @@ class GoodsList {
     this.goods = [];
   }
 
-  fetchGoods() {
-    this.goods = [
-      { title: "Shirt", price: 150 },
-      { title: "Socks", price: 50 },
-      { title: "Jacket", price: 350 },
-      { title: "Shoes", price: 250 },
-    ];
+  fetchGoods(cb) {
+    makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
+      this.goods = JSON.parse(goods);
+      cb();
+    });
   }
 
   summaryPrice() {
@@ -37,7 +54,7 @@ class GoodsList {
   render() {
     let listHtml = "";
     this.goods.forEach((good) => {
-      const goodItem = new GoodsItem(good.title, good.price);
+      const goodItem = new GoodsItem(good.product_name, good.price);
       listHtml += goodItem.render();
     });
     document.querySelector(".goods-list").innerHTML = listHtml;
@@ -45,42 +62,27 @@ class GoodsList {
 }
 
 const list = new GoodsList();
-list.fetchGoods();
-list.render();
+
+list.fetchGoods(() => {
+  list.render();
+});
+
 list.summaryPrice();
 
-class Hamburger {
-  constructor(size, stuffing, topping) {
-    this.size = size;
-    this.stuffing = stuffing;
-    this.topping = topping;
+class Cart {
+  constructor() {
+    this.goods = [];
   }
 
-  calculatePrice() {
-    let price = 0;
-
-    this.size === "small" ? (price += 50) : (price += 100);
-    this.topping === "cheese" && (price += 10);
-    this.topping === "salad" && (price += 20);
-    this.topping === "potato" && (price += 15);
-    this.stuffing === "pepper" ? (price += 15) : (price += 20);
-
-    return price;
-  }
-
-  calculateCalories() {
-    let calories = 0;
-
-    this.size === "small" ? (calories += 20) : (calories += 40);
-    this.topping === "cheese" && (calories += 20);
-    this.topping === "salad" && (calories += 5);
-    this.topping === "potato" && (calories += 10);
-    this.stuffing === "pepper" ? (calories += 0) : (calories += 5);
-
-    return calories;
+  fetchGoods() {
+    makeGETRequest(`${API_URL}/getBasket.json`, (goods) => {
+      this.goods = JSON.parse(goods).contents;
+    });
   }
 }
 
-const hamburger = new Hamburger("small", "pepper", "potato");
-console.log(hamburger.calculatePrice());
-console.log(hamburger.calculateCalories());
+const cart = new Cart();
+
+cart.fetchGoods();
+
+console.log(cart);
