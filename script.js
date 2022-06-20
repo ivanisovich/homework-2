@@ -1,18 +1,23 @@
-function makeGETRequest(url, callback) {
-  var xhr;
-  if (window.XMLHttpRequest) {
-    xhr = new XMLHttpRequest();
-  } else if (window.ActiveXObject) {
-    xhr = new ActiveXObject("Microsoft.XMLHTTP");
-  }
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      callback(xhr.responseText);
+var makeGETRequest = function (url,callback) {
+  return new Promise((resolve, reject) => {
+    var xhr;
+    if (window.XMLHttpRequest) {
+      xhr = new XMLHttpRequest();
+    } else if (window.ActiveXObject) {
+      xhr = new ActiveXObject("Microsoft.XMLHTTP");
     }
-  };
-  xhr.open("GET", url, true);
-  xhr.send();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        callback(xhr.responseText);
+      }
+    };
+    xhr.open("GET", url, true);
+    xhr.send();
+  
+     resolve("resolved")
+  });
 }
+  
 
 const API_URL =
   "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
@@ -86,3 +91,4 @@ const cart = new Cart();
 cart.fetchGoods();
 
 console.log(cart);
+
