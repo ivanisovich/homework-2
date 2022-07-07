@@ -1,32 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
    <meta charset="UTF-8">
-   <link rel="stylesheet" href="./styles.css">
    <title>eShop</title>
-
+   <link rel="stylesheet" href="styles.css">
+   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+   <script src="script.js"></script>
 </head>
-
 <body>
-   <div id="app">
+   <div id="root">
       <header>
-         <button class="cart-button" type="button">Корзина</button>
+         <h1 class="title">eShop</h1>
+         <div class="search">
+            <input type="text" class="goods-search" v-model="search"/>
+            <custom-button v-on:click="filterItems">искать</custom-button>
+         </div>
+         <div class="actions">
+            <custom-button v-on:click="setVisiability">Корзина</custom-button>
+         </div>
       </header>
       <main>
          <div class="goods-list">
-            <div class="goods-item" v-for="good in filteredGoods">
-               <h3>{{ good.product_name }}</h3>
-               <p>{{ good.price }}</p>
-            </div>
-         </div>
-         <div id="cart">
-
+            <goods-item v-for="item in filteredItems" v-bind:item="item" ></goods-item>
          </div>
       </main>
+      <cart v-if="cardIsVisiable" v-on:closeclick="setVisiability"></cart>
    </div>
-   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-   <script src="script.js"></script>
 </body>
-
 </html>
