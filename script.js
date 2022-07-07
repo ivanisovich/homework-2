@@ -99,6 +99,8 @@ function init() {
       <div class="cart-item">
         <h3>{{ item.product_name }}</h3>
         <p>{{ item.price }}</p>
+        <button>удалить</button>
+        <button>добавить</button>
       </div>
   `,
   });
