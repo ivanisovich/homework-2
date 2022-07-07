@@ -9,16 +9,17 @@ function service(url) {
 
 function init() {
   const app = new Vue({
-    el: '#root',
+    el: "#root",
     data: {
       items: [],
       filteredItems: [],
-      search: '',
-      cardIsVisiable: false
+      search: "",
+      cardIsVisiable: false,
+      cartItems:[],
     },
     methods: {
       setVisiability() {
-        this.cardIsVisiable = !this.cardIsVisiable
+        this.cardIsVisiable = !this.cardIsVisiable;
       },
       fetchGoods() {
         service(GET_GOODS_ITEMS).then((data) => {
@@ -26,31 +27,38 @@ function init() {
           this.filteredItems = data;
         });
       },
+      fetchCart() {
+        service(GET_BASKET_GOODS_ITEMS).then((data) => {
+          this.cartItems = data.contents;
+          this.cartItemsCount = data.countGoods
+        });
+      },
       filterItems() {
         this.filteredItems = this.items.filter(({ product_name }) => {
-          return product_name.match(new RegExp(this.search, 'gui'))
-        })
+          return product_name.match(new RegExp(this.search, "gui"));
+        });
       },
     },
     computed: {
       calculatePrice() {
         return this.filteredItems.reduce((prev, { price }) => {
           return prev + price;
-        }, 0)
-      }
+        }, 0);
+      },
     },
     mounted() {
       this.fetchGoods();
-    }
-  })
+      this.fetchCart();
+    },
+  });
 
-const cart = Vue.component("cart", {
+  const cart = Vue.component("cart", {
     data() {
       return {
-        cartItems: [],
+       
       };
     },
-  
+
     template: `
         <div class="fixed-area">
            <div class="cart-card">
@@ -61,36 +69,58 @@ const cart = Vue.component("cart", {
                  ></div>
               </div>
               <div class="cart-card__content">
-                 content
               </div>
            </div>
         </div>
       `,
-});  
+  });
 
-const customButton = Vue.component("custom-button", {
-  template: `
+  const customButton = Vue.component("custom-button", {
+    template: `
       <button class="search-button" type="button" v-on:click="$emit('click')">
          <slot></slot>
       </button>
     `,
-});
+  });
 
-
-
-const goodsItem = Vue.component("goods-item", {
-  props: ["item"],
-  template: `
+  const goodsItem = Vue.component("goods-item", {
+    props: ["item"],
+    template: `
       <div class="goods-item">
          <h3>{{ item.product_name }}</h3>
          <p>{{ item.price }}</p>
       </div>
     `,
-});
+  });
 
-service(GET_BASKET_GOODS_ITEMS).then((data) => {
-  cart.cartItems = data
-})
+  const cartItem = Vue.component("cart-item", {
+    props: ["item"],
+    template: `
+      <div class="cart-item">
+        <h3>{{ item.product_name }}</h3>
+        <p>{{ item.price }}</p>
+        <button>удалить</button>
+        <button>добавить</button>
+      </div>
+  `,
+  });
+
+  const search = Vue.component("search", {
+    template:`
+    <div class="search">
+      <input type="text" class="goods-search" />
+      <custom-button >искать</custom-button>
+    </div>
+    `
+  });
+
+  const count = Vue.component("count", {
+    props:["count"],
+    template:`
+      <p>Количество {{count}}</p>
+    `
+  })
+
 
 }
 

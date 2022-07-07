@@ -11,10 +11,7 @@
    <div id="root">
       <header>
          <h1 class="title">eShop</h1>
-         <div class="search">
-            <input type="text" class="goods-search" v-model="search"/>
-            <custom-button v-on:click="filterItems">искать</custom-button>
-         </div>
+         <search></search>
          <div class="actions">
             <custom-button v-on:click="setVisiability">Корзина</custom-button>
          </div>
@@ -24,7 +21,12 @@
             <goods-item v-for="item in filteredItems" v-bind:item="item" ></goods-item>
          </div>
       </main>
-      <cart v-if="cardIsVisiable" v-on:closeclick="setVisiability"></cart>
+      
+      <div v-if="cardIsVisiable" v-on:closeclick="setVisiability" class="cart-items">
+         <cart></cart>
+         <count :count="cartItemsCount"></count>
+         <cart-item v-for="item in cartItems" v-bind:item="item" ></cart-item>
+       </div>
    </div>
 </body>
 </html>
